@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Layout Detalhado · Performance de Estudantes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --color-background-primary:   #ffffff;
+      --color-background-secondary: #f5f4f0;
+      --color-background-tertiary:  #eeede9;
+      --color-text-primary:   #1a1a18;
+      --color-text-secondary: #5f5e5a;
+      --color-text-tertiary:  #888780;
+      --color-border-tertiary:  rgba(0,0,0,0.10);
+      --color-border-secondary: rgba(0,0,0,0.18);
+      --font-sans:  'Inter', 'Segoe UI', system-ui, sans-serif;
+      --font-mono:  'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+      --border-radius-sm:  4px;
+      --border-radius-md:  8px;
+      --border-radius-lg: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-background-primary:   #1c1c1a;
+        --color-background-secondary: #252522;
+        --color-background-tertiary:  #2e2e2b;
+        --color-text-primary:   #f0efe9;
+        --color-text-secondary: #b4b2a9;
+        --color-text-tertiary:  #888780;
+        --color-border-tertiary:  rgba(255,255,255,0.10);
+        --color-border-secondary: rgba(255,255,255,0.18);
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      color: var(--color-text-primary);
+      background-color: var(--color-background-tertiary);
+      padding: 2rem 1rem;
+    }
+    .claude-widget { max-width: 700px; margin: 0 auto; background: transparent; }
+    .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+
+    /* ── BARRA SUPERIOR COM BOTÃO VOLTAR ── */
+    .top-link-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .top-link-bar .page-info {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .top-link-bar .page-info span {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #534AB7;
+      display: inline-block;
+    }
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: var(--font-sans);
+      color: #534AB7;
+      background: #EEEDFE;
+      border: 0.5px solid #AFA9EC;
+      border-radius: 20px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .15s, transform .1s;
+      white-space: nowrap;
+    }
+    .btn-back:hover { background: #CECBF6; transform: translateY(-1px); }
+    .btn-back:active { transform: translateY(0); }
+
+    /* ── ESTILOS DO WIDGET ORIGINAL ── */
+    .page-nav{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap}
+    .pnav{padding:7px 14px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--color-border-secondary);border-radius:20px;background:transparent;color:var(--color-text-secondary);transition:all .15s;font-family:var(--font-sans)}
+    .pnav.active{background:#534AB7;color:#EEEDFE;border-color:#534AB7}
+    .page{display:none}.page.active{display:block}
+    .canvas{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:10px;margin-bottom:1.25rem}
+    .header-bar{background:#534AB7;border-radius:6px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .header-title{font-size:13px;font-weight:500;color:#EEEDFE}
+    .header-sub{font-size:10px;color:#AFA9EC}
+    .nav-dots{display:flex;gap:5px}
+    .dot{width:7px;height:7px;border-radius:50%;background:#AFA9EC}
+    .dot.active{background:#EEEDFE}
+    .row{display:flex;gap:7px;margin-bottom:7px;flex-wrap:wrap}
+    .kpi{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:6px;flex:1;min-width:80px;padding:8px 10px}
+    .kpi-label{font-size:9px;color:var(--color-text-secondary);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px}
+    .kpi-val{font-size:16px;font-weight:500;color:#534AB7}
+    .kpi-delta{font-size:9px;margin-top:2px}
+    .delta-up{color:#0F6E56}.delta-dn{color:#993C1D}
+    .viz{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column}
+    .viz-title{font-size:9px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px}
+    .slicer{background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);border-radius:6px;padding:8px 10px}
+    .slicer-title{font-size:9px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px}
+    .slicer-chip{display:inline-block;font-size:9px;padding:2px 7px;border-radius:10px;border:0.5px solid var(--color-border-secondary);margin:2px 2px;color:var(--color-text-secondary)}
+    .slicer-chip.sel{background:#EEEDFE;border-color:#7F77DD;color:#3C3489}
+    .tip-block{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:10px}
+    .tip-head{font-size:13px;font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+    .tip-num{width:20px;height:20px;border-radius:50%;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .tip-body{font-size:12px;color:var(--color-text-secondary);line-height:1.6}
+    .badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:5px;font-weight:500;margin-left:4px}
+    .bp{background:#EEEDFE;color:#3C3489}
+    .bt{background:#E1F5EE;color:#085041}
+    .ba{background:#FAEEDA;color:#633806}
+    .bc{background:#FAECE7;color:#712B13}
+    .divider{height:0.5px;background:var(--color-border-tertiary);margin:1rem 0}
+    .bar-h{height:8px;border-radius:3px;margin:3px 0}
+    .sparkline{display:flex;align-items:flex-end;gap:2px;height:36px}
+    .sp-bar{border-radius:1px 1px 0 0}
+    .legend-row{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--color-text-secondary);margin-bottom:3px}
+    .legend-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+    .palette-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .pal-swatch{width:32px;height:32px;border-radius:4px;display:flex;align-items:flex-end;justify-content:flex-start;padding:3px}
+    .pal-label{font-size:8px;font-weight:500}
+    .color-section{margin-bottom:14px}
+    .color-section-title{font-size:11px;font-weight:500;margin-bottom:6px;color:var(--color-text-secondary)}
+    .page-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+    .page-num{width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:500;display:flex;align-items:center;justify-content:center;background:#EEEDFE;color:#3C3489;flex-shrink:0}
+    .section-head{font-size:15px;font-weight:500;margin-bottom:4px;color:var(--color-text-primary)}
+    .section-sub{font-size:13px;color:var(--color-text-secondary);margin-bottom:1.25rem;line-height:1.6}
+  </style>
+</head>
+<body>
+<div class="claude-widget">
+
+  <!-- BARRA SUPERIOR COM BOTÃO VOLTAR -->
+  <div class="top-link-bar">
+    <div class="page-info">
+      <span></span>
+      Dashboard Layout Detalhado · 3 páginas · Power BI
+    </div>
+    <a href="index.html" class="btn-back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Voltar ao Guia Geral
+    </a>
+  </div>
+
+  <p class="section-head">Layout detalhado do dashboard</p>
+  <p class="section-sub">3 páginas temáticas no Power BI com mockups, notas de configuração, paleta de cores e dicas práticas</p>
+
+  <div class="page-nav">
+    <button class="pnav active" onclick="showPage('p1',this)">Página 1 · Visão Geral</button>
+    <button class="pnav" onclick="showPage('p2',this)">Página 2 · Aprendizagem</button>
+    <button class="pnav" onclick="showPage('p3',this)">Página 3 · Socioeconômico</button>
+    <button class="pnav" onclick="showPage('design',this)">Paleta e Design</button>
+    <button class="pnav" onclick="showPage('tips',this)">Dicas Power BI</button>
+  </div>
+
+  <!-- ═══════════════════ PÁGINA 1 ═══════════════════ -->
+  <div id="p1" class="page active">
+    <div class="page-label"><div class="page-num">1</div> Visão Geral — mockup do layout</div>
+    <div class="canvas">
+      <div class="header-bar">
+        <div><div class="header-title">Performance de Estudantes</div><div class="header-sub">6.607 alunos · Dataset completo</div></div>
+        <div class="nav-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+      </div>
+      <div class="row">
+        <div class="kpi"><div class="kpi-label">Nota média</div><div class="kpi-val">67,2</div><div class="kpi-delta delta-up">▲ vs meta 65,0</div></div>
+        <div class="kpi"><div class="kpi-label">% Alto desempenho</div><div class="kpi-val">18,4%</div><div class="kpi-delta" style="color:var(--color-text-secondary)">Score ≥ 80</div></div>
+        <div class="kpi"><div class="kpi-label">% Baixo desempenho</div><div class="kpi-val">6,1%</div><div class="kpi-delta delta-dn">Score &lt; 60</div></div>
+        <div class="kpi"><div class="kpi-label">Desvio padrão</div><div class="kpi-val">±4,1</div><div class="kpi-delta" style="color:var(--color-text-secondary)">distribuição</div></div>
+      </div>
+      <div class="row">
+        <div class="viz" style="flex:2;min-width:180px">
+          <div class="viz-title">Distribuição do Exam_Score (histograma)</div>
+          <div class="sparkline" style="height:60px;gap:3px;padding-top:4px">
+            <div class="sp-bar" style="height:8%;width:12px;background:#CECBF6"></div>
+            <div class="sp-bar" style="height:22%;width:12px;background:#AFA9EC"></div>
+            <div class="sp-bar" style="height:48%;width:12px;background:#7F77DD"></div>
+            <div class="sp-bar" style="height:100%;width:12px;background:#534AB7"></div>
+            <div class="sp-bar" style="height:88%;width:12px;background:#534AB7"></div>
+            <div class="sp-bar" style="height:72%;width:12px;background:#7F77DD"></div>
+            <div class="sp-bar" style="height:42%;width:12px;background:#7F77DD"></div>
+            <div class="sp-bar" style="height:18%;width:12px;background:#AFA9EC"></div>
+            <div class="sp-bar" style="height:6%;width:12px;background:#CECBF6"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px">
+            <span style="font-size:8px;color:var(--color-text-secondary)">50</span>
+            <span style="font-size:8px;color:var(--color-text-secondary)">65</span>
+            <span style="font-size:8px;color:var(--color-text-secondary)">80+</span>
+          </div>
+        </div>
+        <div class="viz" style="flex:1;min-width:110px;align-items:center">
+          <div class="viz-title" style="align-self:flex-start">Faixa de performance</div>
+          <svg width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="38" fill="none" stroke="#EEEDFE" stroke-width="16"/>
+            <circle cx="45" cy="45" r="38" fill="none" stroke="#534AB7" stroke-width="16" stroke-dasharray="43 196" stroke-dashoffset="0"/>
+            <circle cx="45" cy="45" r="38" fill="none" stroke="#7F77DD" stroke-width="16" stroke-dasharray="86 196" stroke-dashoffset="-43"/>
+            <circle cx="45" cy="45" r="38" fill="none" stroke="#AFA9EC" stroke-width="16" stroke-dasharray="51 196" stroke-dashoffset="-129"/>
+            <circle cx="45" cy="45" r="38" fill="none" stroke="#EEEDFE" stroke-width="16" stroke-dasharray="16 196" stroke-dashoffset="-180"/>
+            <text x="45" y="48" text-anchor="middle" font-size="10" font-weight="500" fill="#534AB7">67,2</text>
+          </svg>
+          <div style="width:100%">
+            <div class="legend-row"><div class="legend-dot" style="background:#534AB7"></div>Alto ≥80 · 18%</div>
+            <div class="legend-row"><div class="legend-dot" style="background:#7F77DD"></div>Méd-Alto 70-79 · 44%</div>
+            <div class="legend-row"><div class="legend-dot" style="background:#AFA9EC"></div>Médio 60-69 · 26%</div>
+            <div class="legend-row"><div class="legend-dot" style="background:#EEEDFE"></div>Baixo &lt;60 · 6%</div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="viz" style="flex:1;min-width:110px">
+          <div class="viz-title">Score por gênero</div>
+          <div style="display:flex;gap:8px;align-items:flex-end;height:40px;margin-top:4px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><div style="height:30px;width:22px;background:#534AB7;border-radius:2px 2px 0 0"></div><span style="font-size:8px;color:var(--color-text-secondary)">Masc</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><div style="height:28px;width:22px;background:#7F77DD;border-radius:2px 2px 0 0"></div><span style="font-size:8px;color:var(--color-text-secondary)">Fem</span></div>
+          </div>
+        </div>
+        <div class="viz" style="flex:1;min-width:110px">
+          <div class="viz-title">Score por tipo de escola</div>
+          <div style="display:flex;gap:8px;align-items:flex-end;height:40px;margin-top:4px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><div style="height:28px;width:22px;background:#1D9E75;border-radius:2px 2px 0 0"></div><span style="font-size:8px;color:var(--color-text-secondary)">Pública</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><div style="height:32px;width:22px;background:#085041;border-radius:2px 2px 0 0"></div><span style="font-size:8px;color:var(--color-text-secondary)">Privada</span></div>
+          </div>
+        </div>
+        <div class="slicer" style="flex:1;min-width:110px">
+          <div class="slicer-title">Filtros ativos</div>
+          <div class="slicer-chip sel">Todos os gêneros</div>
+          <div class="slicer-chip sel">Todas as escolas</div>
+          <div class="slicer-chip">Pública</div>
+          <div class="slicer-chip">Alto desempenho</div>
+        </div>
+      </div>
+    </div>
+    <div class="tip-block">
+      <div class="tip-head"><div class="tip-num" style="background:#EEEDFE;color:#3C3489">i</div> Notas de configuração — Página 1</div>
+      <div class="tip-body">Os 4 KPI cards no topo devem usar o visual <strong>Cartão</strong> nativo do Power BI. Alinhe todos na mesma altura e ative "título desativado" para manter o layout limpo. Use a medida <code>Faixa de Performance</code> como legenda do gráfico de rosca. O histograma pode ser construído com um gráfico de barras agrupado onde o eixo X é uma coluna calculada com intervalos de 5 pontos (50–54, 55–59…).</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ PÁGINA 2 ═══════════════════ -->
+  <div id="p2" class="page">
+    <div class="page-label"><div class="page-num">2</div> Fatores de Aprendizagem — mockup do layout</div>
+    <div class="canvas">
+      <div class="header-bar">
+        <div><div class="header-title">Fatores de Aprendizagem</div><div class="header-sub">Horas, frequência, motivação e tutoria</div></div>
+        <div class="nav-dots"><div class="dot"></div><div class="dot active"></div><div class="dot"></div></div>
+      </div>
+      <div class="row">
+        <div class="kpi"><div class="kpi-label">Média horas estudadas</div><div class="kpi-val">19,9h</div></div>
+        <div class="kpi"><div class="kpi-label">Média frequência</div><div class="kpi-val">79,9%</div></div>
+        <div class="kpi"><div class="kpi-label">Score c/ alta freq.</div><div class="kpi-val">68,5</div><div class="kpi-delta delta-up">▲ vs 65,3 baixa freq.</div></div>
+      </div>
+      <div class="row">
+        <div class="viz" style="flex:2;min-width:180px">
+          <div class="viz-title">Hours_Studied vs Exam_Score (dispersão)</div>
+          <svg width="100%" height="80" viewBox="0 0 200 80">
+            <line x1="20" y1="70" x2="195" y2="70" stroke="#D3D1C7" stroke-width="0.5"/>
+            <line x1="20" y1="5" x2="20" y2="70" stroke="#D3D1C7" stroke-width="0.5"/>
+            <circle cx="40" cy="62" r="2.5" fill="#AFA9EC" opacity=".7"/>
+            <circle cx="55" cy="55" r="2.5" fill="#AFA9EC" opacity=".7"/>
+            <circle cx="70" cy="52" r="2.5" fill="#7F77DD" opacity=".8"/>
+            <circle cx="85" cy="48" r="2.5" fill="#7F77DD" opacity=".8"/>
+            <circle cx="100" cy="42" r="2.5" fill="#7F77DD" opacity=".8"/>
+            <circle cx="115" cy="38" r="2.5" fill="#534AB7" opacity=".9"/>
+            <circle cx="130" cy="32" r="2.5" fill="#534AB7" opacity=".9"/>
+            <circle cx="145" cy="28" r="2.5" fill="#534AB7" opacity=".9"/>
+            <circle cx="160" cy="22" r="2.5" fill="#3C3489"/>
+            <circle cx="175" cy="16" r="2.5" fill="#3C3489"/>
+            <line x1="35" y1="65" x2="180" y2="12" stroke="#7F77DD" stroke-width="1" stroke-dasharray="3,2"/>
+            <text x="22" y="73" font-size="7" fill="#888780">5h</text>
+            <text x="170" y="73" font-size="7" fill="#888780">30h</text>
+          </svg>
+        </div>
+        <div class="viz" style="flex:1;min-width:110px">
+          <div class="viz-title">Score por Motivation_Level</div>
+          <div style="display:flex;gap:10px;align-items:flex-end;height:55px;margin-top:4px;padding:0 4px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1">
+              <div style="width:2px;height:8px;background:#AFA9EC"></div>
+              <div style="width:14px;height:20px;background:#AFA9EC;border-radius:1px"></div>
+              <div style="width:2px;height:6px;background:#AFA9EC"></div>
+              <span style="font-size:8px;color:var(--color-text-secondary)">Low</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1">
+              <div style="width:2px;height:10px;background:#7F77DD"></div>
+              <div style="width:14px;height:22px;background:#7F77DD;border-radius:1px"></div>
+              <div style="width:2px;height:6px;background:#7F77DD"></div>
+              <span style="font-size:8px;color:var(--color-text-secondary)">Med</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1">
+              <div style="width:2px;height:14px;background:#534AB7"></div>
+              <div style="width:14px;height:26px;background:#534AB7;border-radius:1px"></div>
+              <div style="width:2px;height:5px;background:#534AB7"></div>
+              <span style="font-size:8px;color:var(--color-text-secondary)">High</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="viz" style="flex:1;min-width:100px">
+          <div class="viz-title">Score por Parental_Involvement</div>
+          <div style="margin-top:6px">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:28px">High</span><div class="bar-h" style="flex:1;background:#534AB7"></div></div>
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:28px">Med</span><div class="bar-h" style="flex:0.85;background:#7F77DD"></div></div>
+            <div style="display:flex;align-items:center;gap:5px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:28px">Low</span><div class="bar-h" style="flex:0.7;background:#AFA9EC"></div></div>
+          </div>
+        </div>
+        <div class="viz" style="flex:1;min-width:100px">
+          <div class="viz-title">Score por Tutoring_Sessions</div>
+          <div class="sparkline" style="gap:6px;margin-top:4px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="sp-bar" style="height:20px;width:16px;background:#AFA9EC;border-radius:2px 2px 0 0"></div><span style="font-size:7px;color:var(--color-text-secondary)">0</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="sp-bar" style="height:26px;width:16px;background:#7F77DD;border-radius:2px 2px 0 0"></div><span style="font-size:7px;color:var(--color-text-secondary)">1</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="sp-bar" style="height:30px;width:16px;background:#7F77DD;border-radius:2px 2px 0 0"></div><span style="font-size:7px;color:var(--color-text-secondary)">2</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div class="sp-bar" style="height:34px;width:16px;background:#534AB7;border-radius:2px 2px 0 0"></div><span style="font-size:7px;color:var(--color-text-secondary)">3+</span></div>
+          </div>
+        </div>
+        <div class="viz" style="flex:1;min-width:100px">
+          <div class="viz-title">Radar · Perfil do aluno</div>
+          <svg width="100%" height="80" viewBox="0 0 200 90">
+            <polygon points="100,8 160,35 140,78 60,78 40,35" fill="none" stroke="#D3D1C7" stroke-width="0.5"/>
+            <polygon points="100,25 140,42 128,68 72,68 60,42" fill="none" stroke="#D3D1C7" stroke-width="0.5"/>
+            <polygon points="100,10 155,38 136,76 64,76 45,38" fill="#EEEDFE" stroke="#7F77DD" stroke-width="1.2" opacity=".7"/>
+            <polygon points="100,38 120,45 114,62 86,62 80,45" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1.2" opacity=".7"/>
+            <text x="100" y="5" text-anchor="middle" font-size="7" fill="#534AB7">Horas</text>
+            <text x="165" y="37" font-size="7" fill="#534AB7">Freq.</text>
+            <text x="142" y="84" font-size="7" fill="#534AB7">Tutoria</text>
+            <text x="50" y="84" font-size="7" fill="#534AB7">Motiv.</text>
+            <text x="28" y="37" font-size="7" fill="#534AB7">Prev.</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="tip-block">
+      <div class="tip-head"><div class="tip-num" style="background:#EEEDFE;color:#3C3489">i</div> Notas de configuração — Página 2</div>
+      <div class="tip-body">O gráfico de dispersão requer o visual nativo <strong>Gráfico de dispersão</strong> com <code>Hours_Studied</code> no eixo X, <code>Exam_Score</code> no eixo Y e <code>Motivation_Level</code> como legenda de cor. Adicione uma linha de tendência em <em>Analytics → Linha de tendência</em>. Para o box plot, use o visual de comunidade <strong>Box and Whisker Chart</strong> da Microsoft AppSource — é gratuito. O gráfico radar pode ser feito com o visual <strong>Radar Chart</strong> do AppSource.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ PÁGINA 3 ═══════════════════ -->
+  <div id="p3" class="page">
+    <div class="page-label"><div class="page-num">3</div> Contexto Socioeconômico — mockup do layout</div>
+    <div class="canvas">
+      <div class="header-bar" style="background:#085041">
+        <div><div class="header-title">Contexto Socioeconômico</div><div class="header-sub">Renda, educação parental, acesso digital</div></div>
+        <div class="nav-dots"><div class="dot"></div><div class="dot"></div><div class="dot active"></div></div>
+      </div>
+      <div class="row">
+        <div class="kpi"><div class="kpi-label">Gap Internet</div><div class="kpi-val">+2,1</div><div class="kpi-delta delta-up">c/ acesso vs sem</div></div>
+        <div class="kpi"><div class="kpi-label">Score renda alta</div><div class="kpi-val">68,0</div></div>
+        <div class="kpi"><div class="kpi-label">Score renda baixa</div><div class="kpi-val">66,0</div><div class="kpi-delta delta-dn">gap: 2 pontos</div></div>
+      </div>
+      <div class="row">
+        <div class="viz" style="flex:1;min-width:140px">
+          <div class="viz-title">Score por Family_Income</div>
+          <div style="margin-top:8px">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:32px">High</span><div class="bar-h" style="flex:1;background:#085041"></div><span style="font-size:8px;color:var(--color-text-secondary)">68,0</span></div>
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:32px">Med</span><div class="bar-h" style="flex:0.88;background:#1D9E75"></div><span style="font-size:8px;color:var(--color-text-secondary)">67,2</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:32px">Low</span><div class="bar-h" style="flex:0.76;background:#5DCAA5"></div><span style="font-size:8px;color:var(--color-text-secondary)">66,0</span></div>
+          </div>
+        </div>
+        <div class="viz" style="flex:1;min-width:140px">
+          <div class="viz-title">Score por Parental_Education_Level</div>
+          <div style="margin-top:8px">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:44px">Postgrad</span><div class="bar-h" style="flex:1;background:#085041"></div></div>
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:44px">College</span><div class="bar-h" style="flex:0.92;background:#1D9E75"></div></div>
+            <div style="display:flex;align-items:center;gap:5px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:44px">High Sch.</span><div class="bar-h" style="flex:0.82;background:#5DCAA5"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="viz" style="flex:1;min-width:120px">
+          <div class="viz-title">Score por Internet_Access</div>
+          <div style="display:flex;gap:12px;align-items:flex-end;height:44px;margin-top:6px;padding:0 8px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><div style="height:38px;width:28px;background:#1D9E75;border-radius:2px 2px 0 0"></div><span style="font-size:8px;color:var(--color-text-secondary)">Sim</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:3px"><div style="height:28px;width:28px;background:#9FE1CB;border-radius:2px 2px 0 0"></div><span style="font-size:8px;color:var(--color-text-secondary)">Não</span></div>
+          </div>
+        </div>
+        <div class="viz" style="flex:1;min-width:120px">
+          <div class="viz-title">Score por Peer_Influence</div>
+          <div style="margin-top:8px">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:36px">Positiva</span><div class="bar-h" style="flex:1;background:#534AB7"></div></div>
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:36px">Neutra</span><div class="bar-h" style="flex:0.85;background:#7F77DD"></div></div>
+            <div style="display:flex;align-items:center;gap:5px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:36px">Negativa</span><div class="bar-h" style="flex:0.68;background:#AFA9EC"></div></div>
+          </div>
+        </div>
+        <div class="viz" style="flex:1;min-width:120px">
+          <div class="viz-title">Score por Distance_from_Home</div>
+          <div style="margin-top:8px">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:32px">Perto</span><div class="bar-h" style="flex:1;background:#EF9F27"></div></div>
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:32px">Médio</span><div class="bar-h" style="flex:0.88;background:#FAC775"></div></div>
+            <div style="display:flex;align-items:center;gap:5px"><span style="font-size:8px;color:var(--color-text-secondary);min-width:32px">Longe</span><div class="bar-h" style="flex:0.74;background:#FAEEDA"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="viz" style="flex:1;min-width:200px">
+          <div class="viz-title">Top combinações de fatores · Score médio</div>
+          <div style="margin-top:6px">
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><span style="font-size:9px;color:var(--color-text-secondary)">High Motiv + High Parental + High Income</span><span style="font-size:9px;font-weight:500;color:#085041">71,4</span></div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><span style="font-size:9px;color:var(--color-text-secondary)">High Motiv + Private School + Internet</span><span style="font-size:9px;font-weight:500;color:#085041">70,8</span></div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><span style="font-size:9px;color:var(--color-text-secondary)">High Resources + Positive Peers + Postgrad Parent</span><span style="font-size:9px;font-weight:500;color:#1D9E75">70,1</span></div>
+            <div style="display:flex;justify-content:space-between;padding:4px 0"><span style="font-size:9px;color:var(--color-text-secondary)">Low Income + No Internet + Low Parental</span><span style="font-size:9px;font-weight:500;color:#993C1D">64,2</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tip-block">
+      <div class="tip-head"><div class="tip-num" style="background:#E1F5EE;color:#085041">i</div> Notas de configuração — Página 3</div>
+      <div class="tip-body">Use cores <strong>diferentes por página</strong> para criar identidade visual: Página 1 → roxo (#534AB7), Página 2 → roxo com acento teal, Página 3 → teal (#085041). A tabela de combinações de fatores pode ser construída com uma <strong>Tabela</strong> nativa ou <strong>Matrix</strong> com as colunas-chave. Ative <em>formatação condicional por cor de fonte</em> nas colunas de score para destacar valores altos em verde e baixos em vermelho automaticamente.</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ PALETA ═══════════════════ -->
+  <div id="design" class="page">
+    <div class="page-label"><div class="page-num">C</div> Paleta de cores e guia de design</div>
+    <div class="tip-block">
+      <div class="color-section">
+        <div class="color-section-title">Roxo — cor primária (Páginas 1 e 2)</div>
+        <div class="palette-row">
+          <div class="pal-swatch" style="background:#EEEDFE"><span class="pal-label" style="color:#3C3489">50</span></div>
+          <div class="pal-swatch" style="background:#CECBF6"><span class="pal-label" style="color:#3C3489">100</span></div>
+          <div class="pal-swatch" style="background:#AFA9EC"><span class="pal-label" style="color:#26215C">200</span></div>
+          <div class="pal-swatch" style="background:#7F77DD"><span class="pal-label" style="color:#26215C">400</span></div>
+          <div class="pal-swatch" style="background:#534AB7"><span class="pal-label" style="color:#EEEDFE">600</span></div>
+          <div class="pal-swatch" style="background:#3C3489"><span class="pal-label" style="color:#EEEDFE">800</span></div>
+        </div>
+        <div style="font-size:11px;color:var(--color-text-secondary);margin-top:6px">Use 600 nos KPIs e barras principais · 400 nos secundários · 200 nos terciários</div>
+      </div>
+      <div class="color-section">
+        <div class="color-section-title">Teal — cor secundária (Página 3 e destaques)</div>
+        <div class="palette-row">
+          <div class="pal-swatch" style="background:#E1F5EE"><span class="pal-label" style="color:#085041">50</span></div>
+          <div class="pal-swatch" style="background:#9FE1CB"><span class="pal-label" style="color:#04342C">100</span></div>
+          <div class="pal-swatch" style="background:#5DCAA5"><span class="pal-label" style="color:#04342C">200</span></div>
+          <div class="pal-swatch" style="background:#1D9E75"><span class="pal-label" style="color:#E1F5EE">400</span></div>
+          <div class="pal-swatch" style="background:#0F6E56"><span class="pal-label" style="color:#E1F5EE">600</span></div>
+          <div class="pal-swatch" style="background:#085041"><span class="pal-label" style="color:#E1F5EE">800</span></div>
+        </div>
+      </div>
+      <div class="color-section">
+        <div class="color-section-title">Âmbar — distância, alertas</div>
+        <div class="palette-row">
+          <div class="pal-swatch" style="background:#FAEEDA"><span class="pal-label" style="color:#633806">50</span></div>
+          <div class="pal-swatch" style="background:#FAC775"><span class="pal-label" style="color:#412402">100</span></div>
+          <div class="pal-swatch" style="background:#EF9F27"><span class="pal-label" style="color:#412402">400</span></div>
+          <div class="pal-swatch" style="background:#633806"><span class="pal-label" style="color:#FAEEDA">800</span></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div style="font-size:12px;font-weight:500;margin-bottom:8px;color:var(--color-text-primary)">Regras tipográficas no Power BI</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px">
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px"><div style="font-size:11px;color:var(--color-text-secondary)">Título do relatório</div><div style="font-size:13px;font-weight:500;margin-top:3px">Segoe UI · 14px · 500</div></div>
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px"><div style="font-size:11px;color:var(--color-text-secondary)">Título do visual</div><div style="font-size:13px;font-weight:500;margin-top:3px">Segoe UI · 10px · normal</div></div>
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px"><div style="font-size:11px;color:var(--color-text-secondary)">Valor KPI</div><div style="font-size:13px;font-weight:500;margin-top:3px">Segoe UI · 24–28px · 500</div></div>
+        <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px"><div style="font-size:11px;color:var(--color-text-secondary)">Rótulos de eixo</div><div style="font-size:13px;font-weight:500;margin-top:3px">Segoe UI · 9px · normal</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ DICAS ═══════════════════ -->
+  <div id="tips" class="page">
+    <div class="page-label"><div class="page-num">T</div> Dicas práticas de configuração no Power BI</div>
+    <div class="tip-block"><div class="tip-head"><div class="tip-num" style="background:#EEEDFE;color:#3C3489">1</div> Organize o modelo antes de criar visuais <span class="badge bp">Modelo</span></div><div class="tip-body">Crie uma tabela separada chamada <code>_Métricas</code> para todas as suas medidas DAX — nunca as deixe soltas na tabela principal. Oculte colunas auxiliares com clique direito → "Ocultar na exibição de relatório".</div></div>
+    <div class="tip-block"><div class="tip-head"><div class="tip-num" style="background:#EEEDFE;color:#3C3489">2</div> Use um tema JSON personalizado <span class="badge bp">Design</span></div><div class="tip-body">Exporte um tema JSON em <em>Exibição → Temas → Personalizar tema atual</em> e defina as 6 cores da paleta. Assim todos os visuais novos herdam automaticamente as cores certas sem ajuste manual.</div></div>
+    <div class="tip-block"><div class="tip-head"><div class="tip-num" style="background:#EEEDFE;color:#3C3489">3</div> Slicers sincronizados entre páginas <span class="badge bt">Interatividade</span></div><div class="tip-body">Vá em <em>Exibição → Sincronizar segmentações</em> e marque os filtros de <code>Gender</code>, <code>School_Type</code> e <code>Faixa de Performance</code> para sincronizar nas 3 páginas. O usuário filtra uma vez e a seleção aplica ao relatório inteiro.</div></div>
+    <div class="tip-block"><div class="tip-head"><div class="tip-num" style="background:#EEEDFE;color:#3C3489">4</div> Formatação condicional nos KPIs <span class="badge bp">Design</span></div><div class="tip-body">Nos cartões KPI, use <em>Formatação condicional → Cor da fonte</em> com regras: score acima da média → verde teal (#1D9E75), abaixo → coral (#D85A30).</div></div>
+    <div class="tip-block"><div class="tip-head"><div class="tip-num" style="background:#EEEDFE;color:#3C3489">5</div> Drillthroughs para análise detalhada <span class="badge bt">Interatividade</span></div><div class="tip-body">Crie uma <strong>página de drillthrough</strong> (clique direito em página → "Adicionar página de drillthrough"). Quando o usuário clica em um ponto no gráfico de dispersão, é levado automaticamente aos detalhes daquele grupo de alunos.</div></div>
+    <div class="tip-block"><div class="tip-head"><div class="tip-num" style="background:#EEEDFE;color:#3C3489">6</div> Visuais do AppSource recomendados <span class="badge ba">Plugins</span></div><div class="tip-body">Instale pelo AppSource (gratuitos): <strong>Box and Whisker Chart</strong> para o box plot de Motivation_Level, <strong>Radar Chart</strong> da Microsoft para o perfil do aluno, e <strong>Correlation Plot</strong> para o mapa de calor.</div></div>
+    <div class="tip-block"><div class="tip-head"><div class="tip-num" style="background:#EEEDFE;color:#3C3489">7</div> Power Query — limpeza recomendada <span class="badge bc">ETL</span></div><div class="tip-body">No Power Query, crie uma coluna <code>Faixa_Score</code> com <em>Adicionar coluna → Coluna condicional</em>. Converta <code>Parental_Involvement</code>, <code>Motivation_Level</code> e <code>Family_Income</code> em colunas ordinais (Low=1, Medium=2, High=3) para ordenação correta nos eixos.</div></div>
+  </div>
+
+</div><!-- /.claude-widget -->
+
+<script>
+function showPage(id, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.pnav').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
